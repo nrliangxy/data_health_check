@@ -57,3 +57,7 @@ class NewsHealthCheck(BaseHealthCheck):
         if isinstance(data, dict):
             data = pendulum.create(**format_pendulum(data))
             return pendulum.create(1900, 1, 1) < data < pendulum.now('UTC')
+    
+    @classmethod
+    def valid_title(cls, title, **kwargs):
+        return not is_empty(title) and between(len(title), 16, 230)
