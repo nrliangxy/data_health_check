@@ -60,4 +60,40 @@ class NewsHealthCheck(BaseHealthCheck):
     
     @classmethod
     def valid_title(cls, title, **kwargs):
-        return not is_empty(title) and between(len(title), 16, 230)
+        return not is_empty(title) and between(len(title), 16, 230) and filter_unenglish_news(title)
+    
+    @classmethod
+    def valid_source_url(cls, source_url, **kwargs):
+        return is_url(source_url)
+    
+    @classmethod
+    def valid_news_id(cls, news_id, **kwargs):
+        return not is_empty(news_id)
+    
+    @classmethod
+    def valid_content(cls, content, **kwargs):
+        return not is_empty(content) and between(len(content), 200, 55000) and not cls.is_multimedia_inside(
+            content) and filter_unenglish_news(content[:20])
+    
+    @classmethod
+    def valid_tags(cls, tags, **kwargs):
+        return True if tags is None else (duplicate(tags) and not is_empty(tags))
+    
+    @classmethod
+    def valid_categories(cls, categories, **kwargs):
+        return True if categories is None else (duplicate(categories) and not is_empty(categories))
+    
+    @classmethod
+    def valid_authors(cls, authors, **kwargs):
+        return True if authors is None else (duplicate(authors) and not is_empty(authors))
+    
+    @classmethod
+    def valid_post_ti(cls, post_ti, **kwargs):
+        post_time = datetime.datetime.utcfromtimestamp(kwargs['post_ts'])
+        same_post = (
+        post_time.year == post_ti['year'] and post_time.month == post_ti['month'] and post_time.day == post_ti['day'])
+        return same_post
+    
+    @classmethod
+    def valid_source_categories(cls, source_categories, **kwargs):
+        return duplicate(source_categories) and not is_empty(source_categories)
